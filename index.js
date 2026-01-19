@@ -5,6 +5,10 @@ const cityContainer = document.getElementById("cityContainer");
 const settings = document.querySelector(".btn-settings");
 const searchContent = document.querySelector("#searchContent");
 const switchBtn = document.querySelector(".switch-btn");
+const metricModes = document.querySelectorAll(".metric");
+const imperialModes = document.querySelectorAll(".imperial");
+const mode = document.getElementById("mode");
+const popup = document.getElementById("popup");
 const dropsettings = document.querySelector(".dropdown-settings");
 const days = document.querySelector(".hourOption");
 const dropdownDays = document.querySelectorAll(".dropdown-days");
@@ -23,9 +27,6 @@ const dailyDataContainer = document.querySelector(".card");
 const currentDay = document.getElementById("currentDay");
 const d1 = document.getElementById("d1");
 const iconTemp = document.querySelector(".iconTemp");
-const urlImperial =
-  "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m&current=temperature_2m,precipitation,relative_humidity_2m,apparent_temperature,wind_speed_10m&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch";
-
 const cityNames = "https://api.turkiyeapi.dev/v1/provinces";
 var cityList = [];
 var cityLat = 0;
@@ -54,7 +55,7 @@ const codes = {
   snow: [71, 73, 75, 77, 85, 86],
   storm: [95, 96, 99],
 };
-
+/* prend la liste des villes */
 fetch(cityNames)
   .then((res) => res.json())
   .then(({ data }) =>
@@ -77,7 +78,8 @@ fetch(cityNames)
   )
   .catch((err) => console.log(err));
 
-getCoordonates = (ct) => {
+/* Retourne les coordonnées d'une ville*/
+const getCoordonates = (ct) => {
   city = ct;
   fetch(
     `https://geocoding-api.open-meteo.com/v1/search?name=${ct}&country_code=TR&count=10&language=en&format=json`,
@@ -91,30 +93,87 @@ getCoordonates = (ct) => {
     .catch((error) => console.error("Error fetching geocoding data:", error));
 };
 
-getWeatherData = (lat, long) => {
-  fetch(
-    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&daily=weather_code,temperature_2m_max,temperature_2m_min&hourly=temperature_2m,weather_code&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,wind_speed_10m&timezone=auto`,
-  )
-    .then((response) => response.json())
-    .then((data) => {
-      createCurrentWeather(data);
-      createDailyWeather(data);
-      createHourlyWeather(data);
-    })
-    .catch((error) => console.error("Error fetching weather data:", error));
+const getLink = (lat, long) => {
+  let link = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&daily=weather_code,temperature_2m_max,temperature_2m_min&hourly=temperature_2m,weather_code&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,wind_speed_10m&timezone=auto&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch`;
+  if (mode.textContent.trim() == "imperial") {
+    link = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&daily=weather_code,temperature_2m_max,temperature_2m_min&hourly=temperature_2m,weather_code&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,wind_speed_10m&timezone=auto`;
+  }
+  return link;
 };
 
-createCurrentWeather = (data) => {
-  ((cityName.textContent = city),
-    (countryName.textContent = country),
-    (temperature.textContent = data.current.temperature_2m + " °"),
-    (feelsLike.textContent = data.current.apparent_temperature + " °"),
-    (humidity.textContent = data.current.relative_humidity_2m + " %"),
-    (wind.textContent = data.current.wind_speed_10m + " km/h"),
-    (precipitation.textContent = data.current.precipitation + " mm"));
+const changeMode = () => {
+  if (mode.textContent.trim() == "imperial") {
+    mode.textContent = " metric";
+    document.querySelectorAll(".imperial span").forEach((el) => {
+      el.hidden = false;
+    });
+    document.querySelectorAll(".imperial ").forEach((el) => {
+      el.classList.add("active");
+    });
+    document.querySelectorAll(".metric ").forEach((el) => {
+      el.classList.remove("active");
+    });
+    document.querySelectorAll(".metric span").forEach((el) => {
+      el.hidden = true;
+    });
+  } else {
+    mode.textContent = " imperial";
+    document.querySelectorAll(".metric span").forEach((el) => {
+      el.hidden = false;
+    });
+    document.querySelectorAll(".metric ").forEach((el) => {
+      el.classList.add("active");
+    });
+    document.querySelectorAll(".imperial ").forEach((el) => {
+      el.classList.remove("active");
+    });
+    document.querySelectorAll(".imperial span").forEach((el) => {
+      el.hidden = true;
+    });
+  }
 };
 
-createDailyWeather = (data) => {
+/* Affiche tous les données (Metric mode)*/
+const getWeatherData = (lat, long) => {
+  const link = getLink(lat, long);
+  if (searchContent.value.trim() != "Search for a place...") {
+    fetch(link)
+      .then((response) => response.json())
+      .then((data) => {
+        createCurrentWeather(data);
+        createDailyWeather(data);
+        createHourlyWeather(data);
+      })
+      .catch((error) => console.error("Error fetching weather data:", error));
+  }
+};
+
+// Current Weather
+const createCurrentWeather = (data) => {
+  cityName.textContent = city;
+  countryName.textContent = country;
+  temperature.textContent = data.current.temperature_2m + " °";
+  feelsLike.textContent = data.current.apparent_temperature + " °";
+  humidity.textContent = data.current.relative_humidity_2m + " %";
+  wind.textContent =
+    data.current.wind_speed_10m +
+    `${mode.textContent.trim() == "imperial" ? " km/h" : " mph"}`;
+  precipitation.textContent =
+    data.current.precipitation +
+    `${mode.textContent.trim() == "imperial" ? " mm" : " in"}`;
+};
+const initialisedData = () => {
+  cityName.textContent = "";
+  countryName.textContent = "";
+  temperature.textContent = "";
+  feelsLike.textContent = "";
+  humidity.textContent = "";
+  wind.textContent = "";
+  precipitation.textContent = "";
+  document.querySelectorAll(".day").innerHTML = "";
+};
+// Daily Weather
+const createDailyWeather = (data) => {
   document.querySelectorAll(".day").innerHTML = "";
   data.daily.time.forEach((dateStr, index) => {
     const dateObj = new Date(dateStr);
@@ -132,7 +191,7 @@ createDailyWeather = (data) => {
   });
 };
 
-createDailyData = (index, maxtemp, mintemp, img, day) => {
+const createDailyData = (index, maxtemp, mintemp, img, day) => {
   const image = document.createElement("img");
   image.src = img;
   image.alt = "weather icon";
@@ -146,7 +205,7 @@ createDailyData = (index, maxtemp, mintemp, img, day) => {
   mainDiv.appendChild(sousElDiv);
 };
 
-createDays = (data) => {
+const createDays = (data) => {
   dropdownDaysItems.forEach((p) => {
     if (currentDay.textContent.trim() === p.textContent.trim()) {
       p.classList.add("active");
@@ -159,7 +218,8 @@ createDays = (data) => {
   });
 };
 
-createHourlyWeather = (data) => {
+// Hourly weather
+const createHourlyWeather = (data) => {
   hourlyData.innerHTML = "";
   data.hourly.time.forEach((timeStr, index) => {
     const dateObj = new Date(timeStr);
@@ -173,7 +233,7 @@ createHourlyWeather = (data) => {
   });
 };
 
-createHourlyData = (day, timeStr, deg, img) => {
+const createHourlyData = (day, timeStr, deg, img) => {
   /*ne prendre que les données du jour sélectionné */
   if (day == currentDay.textContent.trim()) {
     const dateObje = new Date(timeStr);
@@ -189,7 +249,7 @@ createHourlyData = (day, timeStr, deg, img) => {
   }
 };
 
-nextHourData = (data) => {
+const nextHourData = (data) => {
   hourlyData.innerHTML = "";
   const dayName = currentDay.textContent;
   const dayIndex = datesLong.findIndex((d) => d === dayName);
@@ -208,7 +268,8 @@ nextHourData = (data) => {
   });
 };
 
-defineWeatherIcon = (code) => {
+/* Retourne les icones appropriés*/
+const defineWeatherIcon = (code) => {
   if (codes.rain.includes(code)) return "assets/images/icon-rain.webp";
   if (code === codes.clear) return "assets/images/icon-sunny.webp";
   if (codes.partlyCloudy.includes(code))
@@ -218,6 +279,23 @@ defineWeatherIcon = (code) => {
   if (codes.fog.includes(code)) return "assets/images/icon-fog.webp";
   if (codes.snow.includes(code)) return "assets/images/icon-snow.webp";
   return "assets/images/icon-overcast.webp";
+};
+
+/* Affiche tous les données (Imperial mode) */
+const getImperialCurrentWeather = (lat, long) => {
+  changeMode();
+  initialisedData();
+  const imp = getLink(lat, long);
+  if (searchContent.value.trim() != "Search for a place...") {
+    fetch(imp)
+      .then((response) => response.json())
+      .then((data) => {
+        createCurrentWeather(data);
+        createDailyWeather(data);
+        createHourlyWeather(data);
+      })
+      .catch((error) => console.log("error: ", error));
+  }
 };
 
 const unfocused = () => {
@@ -264,6 +342,12 @@ dropsettings.addEventListener("focusout", () => {
 
 settings.addEventListener("focus", () => {
   openSettings();
+});
+settings.addEventListener("focusout", () => {
+  closeSettings();
+});
+switchBtn.addEventListener("click", () => {
+  getImperialCurrentWeather(cityLat, cityLong);
 });
 
 days.addEventListener("focus", () => {

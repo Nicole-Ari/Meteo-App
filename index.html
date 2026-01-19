@@ -25,23 +25,37 @@
           <img src="assets/images/icon-dropdown.svg" alt="dropdown icon" />
         </div>
         <div class="dropdown-settings" tabindex="0">
-          <p class="switch-btn">Switch to imperial</p>
+          <p class="switch-btn active">
+            Switch to <span id="mode">imperial</span>
+          </p>
           <div class="settings-items">
             <p class="title">Temperature</p>
-            <p>Celcius (°C) <span class="checked">&check;</span></p>
-            <p>Fahrenheit (°F)</p>
+            <p class="metric active">
+              Celcius (°C) <span class="checked">&check;</span>
+            </p>
+            <p class="imperial">
+              Fahrenheit (°F) <span class="checked" hidden="true">&check;</span>
+            </p>
           </div>
           <hr />
           <div class="settings-items">
             <p class="title">Wind Speed</p>
-            <p>km/h <span class="checked">&check;</span></p>
-            <p>mph</p>
+            <p class="metric active">
+              km/h <span class="checked">&check;</span>
+            </p>
+            <p class="imperial">
+              mph <span class="checked" hidden="true">&check;</span>
+            </p>
           </div>
           <hr />
           <div class="settings-items">
             <p class="title">Precipitation</p>
-            <p>Millimeters (mm) <span class="checked">&check;</span></p>
-            <p>Inches (in)</p>
+            <p class="metric active">
+              Millimeters (mm) <span class="checked">&check;</span>
+            </p>
+            <p class="imperial">
+              Inches (in) <span class="checked" hidden="true">&check;</span>
+            </p>
           </div>
         </div>
       </div>

@@ -32,7 +32,7 @@
 :root {
   --bg-clr: hsl(243, 96%, 9%);
   --neutral-800: hsl(243, 27%, 20%);
-  --neutral-700: hsl(243, 23%, 24%);
+  --neutral-700: #312f4b;
   --neutral-600: hsl(243, 23%, 30%);
   --neutral-300: hsl(240, 6%, 70%);
   --neutral-200: hsl(250, 6%, 84%);
@@ -134,11 +134,12 @@ body {
 .settings-items p {
   padding-left: 5px;
 }
-.settings-items p:nth-child(2) {
+.settings-items p.active {
   background: var(--neutral-700);
   padding: 8px;
   border-radius: 0.4rem;
 }
+
 .settings-items span {
   float: right;
 }
