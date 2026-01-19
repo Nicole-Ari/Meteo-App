@@ -1,0 +1,459 @@
+@font-face {
+  src: url("assets/fonts/DM_Sans/DMSans-Italic-VariableFont_opsz\,wght.ttf");
+  font-family: "DMSans-Italic";
+}
+@font-face {
+  src: url("assets/fonts/Bricolage_Grotesque/BricolageGrotesque-VariableFont_opsz\,wdth\,wght.ttf");
+  font-family: "Bricolage-Grotesque";
+}
+
+@font-face {
+  src: url("assets/fonts/DM_Sans/static/DMSans-Medium.ttf");
+  font-family: "DMSans-Medium";
+  font-weight: 300;
+}
+@font-face {
+  src: url("assets/fonts/DM_Sans/static/DMSans-Light.ttf");
+  font-family: "DMSans-light";
+  font-weight: 300;
+}
+@font-face {
+  src: url("assets/fonts/DM_Sans/static/DMSans-Bold.ttf");
+  font-family: "DMSans-Bold";
+  font-weight: 700;
+}
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+:root {
+  --bg-clr: hsl(243, 96%, 9%);
+  --neutral-800: hsl(243, 27%, 20%);
+  --neutral-700: hsl(243, 23%, 24%);
+  --neutral-600: hsl(243, 23%, 30%);
+  --neutral-300: hsl(240, 6%, 70%);
+  --neutral-200: hsl(250, 6%, 84%);
+  --neutral-0: hsl(0, 0%, 100%);
+  --orange-500: hsl(28, 100%, 52%);
+  --blue-500: hsl(233, 67%, 56%);
+  --blue-700: hsl(248, 70%, 36%);
+  --ft-main: 18px;
+  --fw-300: 300;
+  --fw-500: 500;
+  --fw-600: 600;
+  --fw-700: 700;
+  --fw-700i: 700i;
+  --ff-main: "DMSans-light", sans-serif;
+  --br-main: 0.5rem;
+}
+
+body {
+  background: var(--bg-clr);
+  color: var(--neutral-0);
+  font-size: var(--ft-main);
+  font-family: var(--ff-main);
+  font-weight: var(--fw-300);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 3rem 5rem;
+}
+.main .header {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+.header .btn-settings {
+  padding: 0.7rem 1rem;
+  background: var(--neutral-800);
+  border-radius: var(--br-main);
+  display: flex;
+  gap: 0.6rem;
+  font-size: smaller;
+  font-weight: var(--fw-300);
+  outline: 1px solid transparent;
+  border: 2px solid transparent;
+}
+.header .btn-settings:hover,
+.search-box button:hover,
+.search-area:hover,
+.search-box input:hover {
+  cursor: pointer;
+}
+
+.dropdown-settings {
+  position: absolute;
+  background: var(--neutral-800);
+  padding: 5px;
+  border-radius: var(--br-main);
+  right: 0;
+  top: 3rem;
+  box-shadow: 0px 5px 20px rgba(3, 1, 45, 0.5);
+  border: 1px solid var(--neutral-600);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  font-size: smaller;
+  width: 200px;
+  visibility: hidden;
+  z-index: 100;
+}
+.dropdown-settings .switch-btn {
+  border: 2px solid var(--neutral-800);
+  outline: 1.5px solid var(--neutral-800);
+  padding: 6px;
+  border-radius: 0.4rem;
+}
+.dropdown-settings .switch-btn:active {
+  border: 2px solid var(--neutral-800);
+  outline: 1.5px solid var(--neutral-0);
+}
+.dropdown-settings .switch-btn:hover {
+  background: var(--neutral-700);
+  cursor: pointer;
+}
+.dropdown-settings hr {
+  border: 1px solid var(--neutral-700);
+}
+.dropdown-settings .settings-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-items .title {
+  color: var(--neutral-300);
+  font-size: smaller;
+}
+.settings-items p {
+  padding-left: 5px;
+}
+.settings-items p:nth-child(2) {
+  background: var(--neutral-700);
+  padding: 8px;
+  border-radius: 0.4rem;
+}
+.settings-items span {
+  float: right;
+}
+.main > h1 {
+  text-align: center;
+  font-family: "Bricolage-Grotesque", sans-serif;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.container .search-box {
+  align-self: center;
+  gap: 0.7rem;
+  display: flex;
+}
+.container .search-box .search-area {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--neutral-800);
+  padding: 0 0 0 1rem;
+  border-radius: var(--br-main);
+  width: 23rem;
+  outline: 1px solid transparent;
+  border: 2px solid transparent;
+}
+.container .search-box .search-area:active {
+  outline: 1px solid var(--neutral-0);
+  border: 2px solid var(--bg-clr);
+}
+.header .btn-settings {
+  outline: 1px solid transparent;
+  border: 2px solid transparent;
+}
+.header .btn-settings:active {
+  outline: 1px solid var(--neutral-0);
+  border: 2px solid var(--bg-clr);
+}
+.container .search-box .dropdown-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.container .search-box .dropdown-items {
+  position: absolute;
+  top: calc(100% + 5px);
+  background: var(--neutral-800);
+  width: 100%;
+  border-radius: var(--br-main);
+  padding: 5px;
+  visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.search-box .dropdown-item {
+  padding: 10px;
+  font-size: smaller;
+  border-radius: var(--br-main);
+}
+.search-box .dropdown-item:hover,
+.dropdown-items .active {
+  background: var(--neutral-700);
+  border: 1px solid var(--neutral-600);
+  cursor: pointer;
+}
+.container .search-box .search-area input {
+  padding: 0.7rem 1rem 0.7rem 0;
+
+  border-radius: var(--br-main);
+  border: none;
+  outline: none;
+  background: none;
+  color: var(--neutral-200);
+  font-weight: var(--fw-300);
+  width: 100%;
+  font-family: "DMSans-Medium", sans-serif;
+  text-align: left;
+}
+.container .search-box .search-area input:hover {
+  cursor: pointer;
+}
+
+.container .search-box button {
+  padding: 0.7rem 1rem;
+  background: var(--blue-500);
+  border-radius: var(--br-main);
+  border: none;
+  cursor: pointer;
+  color: var(--neutral-200);
+  font-weight: var(--fw-500);
+  font-family: "DMSans-Medium", sans-serif;
+  outline: 1.5px solid transparent;
+  border: 2px solid transparent;
+}
+.container .search-box button:active {
+  border: 2px solid var(--bg-clr);
+  outline: 1.5px solid var(--blue-500);
+}
+.container .search-box button:hover {
+  cursor: pointer;
+  background: var(--blue-700);
+}
+.container .content {
+  display: grid;
+  justify-content: space-between;
+  grid-template-columns: 2fr 0.8fr;
+  grid-template-rows: 1fr 0.5fr;
+  column-gap: 1.3rem;
+  row-gap: 2rem;
+  grid-template-areas:
+    "weather hourly"
+    "daily hourly";
+}
+/* -----------------weather-description--------------- */
+.content .weather-description {
+  grid-area: weather;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+.weather-description .location {
+  background-image: url("assets/images/bg-today-large.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  height: 19rem;
+  border-radius: 1.2rem;
+}
+.weather-description .location img {
+  width: 100px;
+}
+.location .left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.location .left h2 {
+  font-family: "DMSans-Bold", sans-serif;
+}
+.location .left p {
+  font-weight: var(--fw-300);
+  color: var(--neutral-200);
+}
+.location .right {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+}
+.location .right h1 {
+  font-size: 6rem;
+
+  font-family: "DMSans-Italic", sans-serif;
+}
+.weather-description .detail {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  justify-content: space-between;
+  height: fit-content;
+}
+.weather-description .dt {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: var(--neutral-800);
+  padding: 1rem;
+  width: 40%;
+  border: 1px solid var(--neutral-600);
+  border-radius: var(--br-main);
+}
+.weather-description .dt p:first-child {
+  color: var(--neutral-200);
+  font-family: "DMSans-Medium", sans-serif;
+}
+.weather-description .dt p:nth-child(2) {
+  font-size: 2rem;
+  font-weight: normal;
+}
+/* -----------------daily forcast-------------- */
+.content .daily-forcast {
+  grid-area: daily;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: fit-content;
+}
+.content .daily-forcast > p {
+  font-family: "DMSans-Medium", sans-serif;
+}
+.daily-forcast .card {
+  grid-area: daily;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  text-align: center;
+}
+.content .daily-forcast img {
+  width: 100px;
+}
+.content .day {
+  background: var(--neutral-800);
+  padding: 0.5rem;
+  min-width: 100px;
+  min-height: 170px;
+  border-radius: var(--br-main);
+  border: 1px solid var(--neutral-600);
+}
+.daily-forcast .desc {
+  display: flex;
+  justify-content: space-between;
+  font-size: smaller;
+}
+
+/* -----------------hourly forcast-------------- */
+.content .hourly-forcast {
+  grid-area: hourly;
+  padding: 1rem;
+  background: var(--neutral-800);
+  border-radius: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 42.5rem;
+  max-height: 42.5rem;
+  position: relative;
+}
+
+.hourly-forcast .top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.hourly-forcast .top p {
+  font-family: "DMSans-Medium", sans-serif;
+}
+.hourly-forcast .top > span {
+  background: var(--neutral-600);
+  padding: 0.5rem;
+  border-radius: var(--br-main);
+  display: flex;
+  gap: 1rem;
+  font-size: smaller;
+  font-weight: var(--fw-300);
+  cursor: pointer;
+}
+.hourly-forcast .items {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.hourly-forcast .items img {
+  width: 50px;
+}
+.items .item {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--neutral-700);
+  border: 1px solid var(--neutral-600);
+  padding: 0 1rem;
+  border-radius: calc(var(--br-main) - 0.2rem);
+}
+.item span {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hourly-forcast .days {
+  display: flex;
+  flex-direction: column;
+  top: 60px;
+  position: absolute;
+  right: 15px;
+  background: var(--neutral-800);
+  width: 180px;
+  padding: 10px;
+  border: 1.5px solid var(--neutral-600);
+  border-radius: var(--br-main);
+  box-shadow: 0px 5px 15px rgba(3, 1, 45, 0.5);
+  visibility: hidden;
+  z-index: 1000;
+}
+.days .dropdown-day {
+  padding: 8px;
+  border-radius: 0.3rem;
+  font-size: smaller;
+}
+.days .dropdown-day:hover,
+.days .active {
+  background: var(--neutral-700);
+  cursor: pointer;
+}
+.hourly-items {
+  position: relative;
+  height: 100%;
+  overflow-y: scroll;
+  padding: 10px;
+}
+.hourly-items::-webkit-scrollbar {
+  width: 4px;
+}
+.hourly-items::-webkit-scrollbar-thumb {
+  background: var(--neutral-600);
+  border-radius: var(--br-main);
+}
+.hourly-items::-webkit-scrollbar-track {
+  background: var(--neutral-700);
+}
