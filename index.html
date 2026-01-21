@@ -31,68 +31,132 @@
           <div class="settings-items">
             <p class="title">Temperature</p>
             <p class="metric active">
-              Celcius (°C) <span class="checked">&check;</span>
+              Celcius (°C)
+              <span class="checked"
+                ><img
+                  src="/assets/images/icon-checkmark.svg"
+                  alt="icon checkmark"
+              /></span>
             </p>
             <p class="imperial">
-              Fahrenheit (°F) <span class="checked" hidden="true">&check;</span>
+              Fahrenheit (°F)
+              <span class="checked" hidden
+                ><img
+                  src="/assets/images/icon-checkmark.svg"
+                  alt="icon checkmark"
+              /></span>
             </p>
           </div>
           <hr />
           <div class="settings-items">
             <p class="title">Wind Speed</p>
             <p class="metric active">
-              km/h <span class="checked">&check;</span>
+              km/h
+              <span class="checked"
+                ><img
+                  src="/assets/images/icon-checkmark.svg"
+                  alt="icon checkmark"
+              /></span>
             </p>
             <p class="imperial">
-              mph <span class="checked" hidden="true">&check;</span>
+              mph
+              <span class="checked" hidden
+                ><img
+                  src="/assets/images/icon-checkmark.svg"
+                  alt="icon checkmark"
+              /></span>
             </p>
           </div>
           <hr />
           <div class="settings-items">
             <p class="title">Precipitation</p>
             <p class="metric active">
-              Millimeters (mm) <span class="checked">&check;</span>
+              Millimeters (mm)
+              <span class="checked"
+                ><img
+                  src="/assets/images/icon-checkmark.svg"
+                  alt="icon checkmark"
+                  class="checked"
+              /></span>
             </p>
             <p class="imperial">
-              Inches (in) <span class="checked" hidden="true">&check;</span>
+              Inches (in)
+              <span class="checked" hidden
+                ><img
+                  src="/assets/images/icon-checkmark.svg"
+                  alt="icon checkmark"
+                  class="checked"
+              /></span>
             </p>
           </div>
         </div>
       </div>
-      <h1>How's the sky looking today?</h1>
-      <div class="container">
+      <h1 class="titles" hidden>How's the sky looking today?</h1>
+      <div class="errorMessage" hidden>
+        <img src="/assets/images/icon-error.svg" alt="error icon" />
+        <h1>Something went wrong</h1>
+        <small>
+          we couldn't connect to the server(API error). please try again in a
+          few moments
+        </small>
+        <button onclick="refresh()">
+          <img
+            src="/assets/images/icon-retry.svg"
+            alt="retry icon"
+            width="13px"
+          />Retry
+        </button>
+      </div>
+      <div class="container" hidden>
         <div class="search-box">
           <div class="dropdown-container">
-            <div class="search-area" tabindex="0" onclick="openDropown()">
+            <div class="search-area">
               <img
                 src="assets/images/icon-search.svg"
                 alt="search icon"
                 width="4%"
               /><input
-                type="button"
                 id="searchContent"
-                value="Search for a place..."
+                placeholder="Search for a place..."
+                autocomplete="off"
               />
             </div>
-            <div class="dropdown-items" tabindex="0" id="cityContainer"></div>
+            <div class="dropdown-items" tabindex="0" id="cityContainer">
+              <div id="loaderElement" hidden>
+                <img
+                  src="/assets/images/icon-loading.svg"
+                  alt="icon loading"
+                  class="loader"
+                />
+                <p class="dropdown-item">Search in progress...</p>
+              </div>
+            </div>
           </div>
 
           <button type="submit" id="searchbtn">Search</button>
         </div>
         <div class="content">
           <div class="weather-description">
-            <div class="location">
-              <div class="left">
-                <h2>
-                  <span id="cityName">-</span> , <span id="countryName">-</span>
-                </h2>
-                <p id="date">-</p>
+            <div class="container-weather">
+              <div class="loadingContainer" hidden>
+                <div class="loaders"></div>
+                <p>Loading...</p>
               </div>
-              <div class="right">
-                <img src="assets/images/icon-sunny.webp" alt="sunny icon" />
-                <h1 id="temperature">-°</h1>
+              <div class="location" hidden>
+                <div class="left">
+                  <h2>
+                    <span id="cityName">-</span> ,
+                    <span id="countryName">-</span>
+                  </h2>
+                  <p id="date"></p>
+                </div>
+                <div class="right">
+                  <img src="assets/images/icon-sunny.webp" alt="sunny icon" />
+                  <h1 id="temperature"></h1>
+                </div>
               </div>
             </div>
+
             <div class="detail">
               <div class="dt degree">
                 <p>Feels like</p>
