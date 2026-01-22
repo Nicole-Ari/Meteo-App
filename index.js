@@ -73,7 +73,6 @@ if ("geolocation" in navigator) {
     });
     getWeatherData(lat, lon, date);
     getCityFromCoords(lat, lon);
-    console.log("dedans");
   });
 }
 
