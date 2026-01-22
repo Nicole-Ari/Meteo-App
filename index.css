@@ -203,6 +203,7 @@ body {
   max-height: 200px;
   overflow-y: auto;
   z-index: 1000;
+  box-shadow: 0px 5px 15px rgba(3, 1, 45, 0.5);
 }
 .search-box .notFound {
   font-family: DMSans-Medium, sans-serif;

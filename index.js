@@ -30,6 +30,8 @@ const first = document.querySelectorAll("first");
 const precipitation = document.getElementById("precipitation");
 const dailyDataContainer = document.querySelector(".card");
 const currentDay = document.getElementById("currentDay");
+const loader = document.getElementById("loaderElement");
+const loadingContainer = document.querySelector(".loadingContainer");
 const d1 = document.getElementById("d1");
 const iconTemp = document.querySelector(".iconTemp");
 const cityNames = "https://api.turkiyeapi.dev/v1/provinces";
@@ -39,6 +41,7 @@ var cityLong = 0;
 var urlMetric = "";
 var city = "";
 var country = "";
+var country_code = "";
 var weatherIcon = "";
 const dates = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const datesLong = [
@@ -60,58 +63,110 @@ const codes = {
   snow: [71, 73, 75, 77, 85, 86],
   storm: [95, 96, 99],
 };
-const loader = document.getElementById("loaderElement");
-const loadingContainer = document.querySelector(".loadingContainer");
+
+if ("geolocation" in navigator) {
+  navigator.geolocation.getCurrentPosition((position) => {
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+    const date = new Date().toLocaleDateString("en-US", {
+      weekday: "long",
+    });
+    getWeatherData(lat, lon, date);
+    getCityFromCoords(lat, lon);
+    console.log("dedans");
+  });
+}
+
+/* prend la liste des villes */
+const getCityNames = (ct) => {
+  fetch(ct)
+    .then((res) => {
+      if (res.status != 200) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      showItems();
+
+      return res.json();
+    })
+    .then(({ data }) => {
+      showItems();
+      cityList = Object.values(data).map((el) => el.name);
+      createCityDropdwon(cityList);
+
+      date.textContent = new Date().toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    })
+    .catch((err) => {
+      hideItems();
+      errorMessage.hidden = false;
+    });
+};
 
 function showLoader() {
   loader.hidden = false;
 }
-function showItems() {
-  titles.hidden = false;
-  container.hidden = false;
-  errorMessage.hidden = true;
-}
-function hideItems() {
-  titles.hidden = true;
-  container.hidden = true;
-  errorMessage.hidden = false;
-}
-showItems();
 
 function hideLoader() {
   loader.hidden = true;
 }
 
-showLoader();
-/* prend la liste des villes */
-fetch(cityNames)
-  .then((res) => {
-    if (res.status != 200) {
-      throw new Error(`HTTP ${res.status}`);
-    }
-    showItems();
+function waitData() {
+  locations.hidden = true;
+  loadingContainer.hidden = false;
+}
 
-    return res.json();
-  })
-  .then(({ data }) => {
-    showItems();
-    cityList = Object.values(data).map((el) => el.name);
-    createCityDropdwon(cityList);
-    date.textContent = new Date().toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+function dataShow() {
+  if (cityName.textContent != "" && countryName.textContent != "") {
+    locations.hidden = false;
+    loadingContainer.hidden = true;
+  }
+}
+
+function showItems() {
+  titles.hidden = false;
+  container.hidden = false;
+  errorMessage.hidden = true;
+}
+
+function hideItems() {
+  titles.hidden = true;
+  container.hidden = true;
+  errorMessage.hidden = false;
+}
+
+showItems();
+showLoader();
+getCityNames(cityNames);
+
+function getCityFromCoords(lat, lon) {
+  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+
+  fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Reverse geocoding failed");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      const address = data.address;
+      country = address.country;
+      city = address.province
+        ? address.province
+        : address.city || address.town || address.village;
+      cityName.textContent = city;
+      countryName.textContent = country;
+
+      country_code = address.country_code;
+      dataShow();
+      getCoordonates(city, country_code);
     });
-  })
-  .catch((err) => {
-    hideItems();
-    errorMessage.hidden = false;
-  })
-  .finally(() => {
-    hideLoader();
-    location.hidden = false;
-  });
+}
+
 const changeMode = () => {
   if (mode.textContent.trim() == "imperial") {
     mode.textContent = " metric";
@@ -143,11 +198,12 @@ const changeMode = () => {
     });
   }
 };
+
 /* Retourne les coordonnées d'une ville*/
-const getCoordonates = (ct) => {
+const getCoordonates = (ct, country_code) => {
   city = ct;
   fetch(
-    `https://geocoding-api.open-meteo.com/v1/search?name=${ct}&country_code=TR&count=10&language=en&format=json`,
+    `https://geocoding-api.open-meteo.com/v1/search?name=${ct}&country_code=${country_code}&count=10&language=en&format=json`,
   )
     .then((response) => {
       if (response.status != 200) {
@@ -161,10 +217,14 @@ const getCoordonates = (ct) => {
       cityLat = data.results[0].latitude;
       cityLong = data.results[0].longitude;
     })
-    .catch((error) => hideItems());
+    .catch((error) => {
+      hideItems();
+    });
 };
+
 /* Affiche tous les données (Imperial mode) */
 const getImperialCurrentWeather = (lat, long, day) => {
+  waitData();
   changeMode();
   initialisedData();
   const imp = getLink(lat, long);
@@ -175,8 +235,7 @@ const getImperialCurrentWeather = (lat, long, day) => {
           throw new Error(`HTTP ${response.status}`);
         }
         showItems();
-        locations.hidden = false;
-        loadingContainer.hidden = true;
+
         return response.json();
       })
       .then((data) => {
@@ -184,13 +243,15 @@ const getImperialCurrentWeather = (lat, long, day) => {
         createDailyWeather(data, day);
         createHourlyWeather(data, day);
       })
-      .catch((error) => hideItems());
+      .catch((error) => {
+        hideItems();
+      });
   }
 };
+
 /* Affiche tous les données (Metric mode)*/
 const getWeatherData = (lat, long, day) => {
-  locations.hidden = true;
-  loadingContainer.hidden = false;
+  waitData();
   const link = getLink(lat, long);
   initialisedData();
   if (searchContent.value.trim() != "Search for a place...") {
@@ -199,8 +260,7 @@ const getWeatherData = (lat, long, day) => {
         if (response.status != 200) {
           throw new Error(`HTTP ${response.status}`);
         }
-        locations.hidden = false;
-        loadingContainer.hidden = true;
+        showItems();
         return response.json();
       })
       .then((data) => {
@@ -208,7 +268,9 @@ const getWeatherData = (lat, long, day) => {
         createDailyWeather(data, day);
         createHourlyWeather(data, day);
       })
-      .catch((error) => hideItems());
+      .catch((error) => {
+        hideItems();
+      });
   }
 };
 
@@ -229,11 +291,12 @@ const createCityDropdwon = (data) => {
       p.textContent = element;
       p.addEventListener("click", (event) => {
         searchContent.value = event.target.textContent;
-        getCoordonates(event.target.textContent);
+        getCoordonates(event.target.textContent, country_code);
         closeDropown();
       });
       cityContainer.appendChild(p);
     });
+    hideLoader();
   } else {
     const p = document.createElement("p");
     p.className = "dropdown-item notFound";
@@ -255,7 +318,9 @@ const createCurrentWeather = (data) => {
   precipitation.textContent =
     data.current.precipitation +
     `${mode.textContent.trim() == "imperial" ? " mm" : " in"}`;
+  dataShow();
 };
+
 const initialisedData = () => {
   cityName.textContent = "-";
   countryName.textContent = "-";
@@ -267,6 +332,7 @@ const initialisedData = () => {
   document.querySelectorAll(".day").forEach((el) => (el.innerHTML = ""));
   document.querySelectorAll(".item").forEach((el) => (el.innerHTML = ""));
 };
+
 // Daily Weather
 const createDailyWeather = (data, day) => {
   document.querySelectorAll(".day").forEach((el) => (el.innerHTML = ""));
@@ -411,15 +477,19 @@ const unfocused = () => {
   const day = currentDay.textContent;
   document.querySelector(`.${day}`).classList.remove("active");
 };
+
 const onTextChange = (txt) => {
   const citySelected = cityList.filter((el) =>
     el.toLowerCase().includes(txt.toLowerCase()),
   );
+
   createCityDropdwon(citySelected);
 };
+
 const refresh = () => {
   window.location.reload();
 };
+
 const observer = new MutationObserver(() => {
   if (currentDay.textContent !== "-") {
     dropdownDaysItems.forEach((el) => {
@@ -439,11 +509,14 @@ observer.observe(currentDay, {
 cityContainer.addEventListener("focusout", closeDropown);
 dropsettings.addEventListener("focusout", closeSettings);
 settings.addEventListener("focus", openSettings);
+
 searchbtn.addEventListener("click", () => {
   first.forEach((el) => el.classList.add("loading"));
   const day =
     currentDay.textContent.trim() != "-" ? currentDay.textContent.trim() : "-";
-  getWeatherData(cityLat, cityLong, day);
+  if (searchContent.value != "") {
+    getWeatherData(cityLat, cityLong, day);
+  }
 });
 
 Dropdowncontainer.addEventListener("focusout", (e) => {
@@ -500,12 +573,15 @@ function openSettings() {
   document.querySelector(".dropdown-settings").style.visibility = "visible";
   document.querySelector(".dropdown-settings").focus();
 }
+
 function closeSettings() {
   document.querySelector(".dropdown-settings").style.visibility = "hidden";
 }
+
 function openDropdownDays() {
   document.querySelector(".days").style.visibility = "visible";
 }
+
 function closeDropdownDays() {
   document.querySelector(".days").style.visibility = "hidden";
 }
