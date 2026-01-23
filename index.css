@@ -63,6 +63,7 @@ body {
   flex-direction: column;
   gap: 2rem;
   padding: 3rem 5rem;
+  overflow-x: hidden;
 }
 .main .header {
   display: flex;
@@ -710,5 +711,10 @@ body {
   }
   .search-area {
     width: 100% !important;
+  }
+}
+@media screen and (max-width: 390px) {
+  .main {
+    padding: 8px !important;
   }
 }
