@@ -308,7 +308,7 @@ const createCityDropdwon = (data) => {
 const createCurrentWeather = (data) => {
   cityName.textContent = city;
   countryName.textContent = country;
-  temperature.textContent = data.current.temperature_2m + " °";
+  temperature.textContent = data.current.temperature_2m + "°";
   feelsLike.textContent = data.current.apparent_temperature + " °";
   humidity.textContent = data.current.relative_humidity_2m + " %";
   wind.textContent =

@@ -259,7 +259,7 @@ body {
 .container .content {
   display: grid;
   justify-content: space-between;
-  grid-template-columns: 2fr 0.8fr;
+  grid-template-columns: 2fr 1fr;
   grid-template-rows: 1fr 0.5fr;
   column-gap: 1.3rem;
   row-gap: 2rem;
@@ -274,12 +274,13 @@ body {
   grid-template-columns: 1fr;
   gap: 1.5rem;
 }
+
 [hidden] {
   display: none !important;
   background-color: var(--neutral-800);
 }
+
 .weather-description .location {
-  /* position: absolute; */
   top: 0;
   background-color: var(--neutral-800);
   background-image: url("assets/images/bg-today-large.svg");
@@ -293,7 +294,6 @@ body {
   border-radius: 1.2rem;
   width: 100%;
   height: 100%;
-  /* z-index: -10; */
 }
 .weather-description .location img {
   width: 100px;
@@ -608,4 +608,107 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+@media screen and (max-width: 1400px) {
+  .container .content {
+    display: grid;
+    justify-content: space-between;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr 0.5fr;
+    column-gap: 1.3rem;
+    row-gap: 2rem;
+    grid-template-areas:
+      "weather hourly"
+      "daily hourly";
+  }
+  .daily-forcast .card {
+    flex-wrap: wrap;
+    justify-content: left;
+    gap: 1rem;
+  }
+  .main {
+    padding: 2rem 2rem;
+    justify-content: space-between;
+  }
+}
+@media screen and (max-width: 1123px) {
+  .container .content {
+    display: grid;
+    justify-content: space-between;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    column-gap: 1.3rem;
+    row-gap: 2rem;
+    grid-template-areas:
+      "weather "
+      "daily "
+      "hourly ";
+  }
+  .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+}
+@media screen and (max-width: 792px) {
+  .location {
+    display: flex;
+    flex-direction: column;
+    padding: 30px !important;
+  }
+  .daily-forcast .card .day {
+    width: 30% !important;
+  }
+}
+@media screen and (max-width: 636px) {
+  .right {
+    gap: 0rem !important;
+    font-size: 2rem !important;
+  }
+}
+@media screen and (max-width: 768px) {
+  .detail {
+    flex-wrap: wrap;
+    justify-content: start !important;
+  }
+  .detail .dt {
+    width: 48% !important;
+  }
+}
+@media screen and (max-width: 520px) {
+  .container .search-box {
+    display: flex;
+    flex-direction: column;
+  }
+  .detail .dt {
+    width: 48% !important;
+  }
+}
+@media screen and (max-width: 479px) {
+  .detail {
+    width: 100% !important;
+    gap: 0.5rem !important;
+  }
+  .right h1 {
+    font-size: 5rem !important;
+  }
+}
+@media screen and (max-width: 439px) {
+  .content {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  .main {
+    padding: 20px !important;
+  }
+  .search-box {
+    width: 100% !important;
+  }
+  .search-area {
+    width: 100% !important;
+  }
 }
