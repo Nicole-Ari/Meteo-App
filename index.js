@@ -16,7 +16,7 @@ const mode = document.getElementById("mode");
 const popup = document.getElementById("popup");
 const dropsettings = document.querySelector(".dropdown-settings");
 const days = document.querySelector(".hourOption");
-const dropdownDays = document.querySelectorAll(".dropdown-days");
+const dropdownDays = document.querySelector(".days");
 const hourlyData = document.querySelector(".items");
 const dropdownDaysItems = document.querySelectorAll(".dropdown-day");
 const countryName = document.getElementById("countryName");
@@ -344,7 +344,12 @@ const createDailyWeather = (data, day) => {
     } else {
       currentDay.textContent = index == 0 ? dayLogName : currentDay.textContent;
     }
-    createDays(data.hourly);
+    /*create dropdown days ( --ne cree pas si deja cree -- )*/
+    if (currentDay.classList.contains("loading")) {
+      const p = createDays(dayLogName, data.hourly);
+      dropdownDays.appendChild(p);
+    }
+
     createDailyData(
       index,
       data.daily.temperature_2m_max[index],
@@ -353,6 +358,7 @@ const createDailyWeather = (data, day) => {
       dayName,
     );
   });
+  currentDay.classList.remove("loading");
 };
 
 const createDailyData = (index, maxtemp, mintemp, img, day) => {
@@ -369,17 +375,22 @@ const createDailyData = (index, maxtemp, mintemp, img, day) => {
   mainDiv.appendChild(sousElDiv);
 };
 
-const createDays = (data) => {
-  dropdownDaysItems.forEach((p) => {
-    if (currentDay.textContent.trim() === p.textContent.trim()) {
-      p.classList.add("active");
-      p.onmouseleave = unfocused;
-    }
-    p.onmousedown = () => {
-      currentDay.textContent = p.textContent;
-      nextHourData(data);
-    };
-  });
+const createDays = (day, data) => {
+  const p = document.createElement("p");
+
+  if (currentDay.textContent === day) {
+    p.className = `${day} dropdown-day active`;
+  } else {
+    p.className = `${day} dropdown-day`;
+  }
+  p.onmouseleave = unfocused;
+  p.onmousedown = () => {
+    currentDay.textContent = day;
+    nextHourData(data);
+  };
+  p.textContent = datesLong.find((d) => d === day);
+
+  return p;
 };
 
 // Hourly weather
