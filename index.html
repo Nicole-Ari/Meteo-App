@@ -16,10 +16,10 @@
     <title>Weather app</title>
   </head>
   <body>
-    <div class="main">
-      <div class="header">
+    <main class="main">
+      <header class="header">
         <img src="assets/images/logo.svg" alt=" logo" />
-        <div class="btn-settings" tabindex="0" onclick="openSettings()">
+        <div div class="btn-settings" tabindex="0" onclick="openSettings()">
           <img src="assets/images/icon-units.svg" alt="setting icon" />
           <p>Units</p>
           <img src="assets/images/icon-dropdown.svg" alt="dropdown icon" />
@@ -90,24 +90,24 @@
             </p>
           </div>
         </div>
-      </div>
+      </header>
       <h1 class="titles" hidden>How's the sky looking today?</h1>
-      <div class="errorMessage" hidden>
+      <section class="errorMessage" hidden>
         <img src="/assets/images/icon-error.svg" alt="error icon" />
         <h1>Something went wrong</h1>
         <small>
           we couldn't connect to the server(API error). please try again in a
           few moments
         </small>
-        <button onclick="refresh()">
+        <button type="button" onclick="refresh()">
           <img
             src="/assets/images/icon-retry.svg"
             alt="retry icon"
             width="13px"
           />Retry
         </button>
-      </div>
-      <div class="container" hidden>
+      </section>
+      <section class="container" hidden>
         <div class="search-box">
           <div class="dropdown-container">
             <div class="search-area">
@@ -122,7 +122,7 @@
                 value=""
               />
             </div>
-            <div class="dropdown-items" tabindex="0" id="cityContainer">
+            <div class="dropdown-items" tabindex="0">
               <div id="loaderElement" hidden>
                 <img
                   src="/assets/images/icon-loading.svg"
@@ -131,10 +131,14 @@
                 />
                 <p class="dropdown-item">Search in progress...</p>
               </div>
+              <div id="cityContainer" hidden></div>
             </div>
           </div>
 
           <button type="submit" id="searchbtn">Search</button>
+        </div>
+        <div id="noResultFound">
+          <p class="noResultFound">No search result found!</p>
         </div>
         <div class="content">
           <div class="weather-description">
@@ -146,14 +150,13 @@
               <div class="location" hidden>
                 <div class="left">
                   <h2>
-                    <span id="cityName">-</span> ,
-                    <span id="countryName">-</span>
+                    <span id="cityName">-</span>
                   </h2>
                   <p id="date"></p>
                 </div>
                 <div class="right">
                   <img src="assets/images/icon-sunny.webp" alt="sunny icon" />
-                  <h1 id="temperature"></h1>
+                  <h1 id="temperature">-</h1>
                 </div>
               </div>
             </div>
@@ -208,8 +211,8 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
     <script src="index.js"></script>
   </body>
 </html>

@@ -8,7 +8,9 @@ const input = document.querySelector(".search-area input");
 const searchbtn = document.getElementById("searchbtn");
 const cityContainer = document.getElementById("cityContainer");
 const settings = document.querySelector(".btn-settings");
-const searchContent = document.querySelector("#searchContent");
+const searchContent = document.getElementById("searchContent");
+const noResultFound = document.getElementById("noResultFound");
+const content = document.querySelector(".content");
 const switchBtn = document.querySelector(".switch-btn");
 const metricModes = document.querySelectorAll(".metric");
 const imperialModes = document.querySelectorAll(".imperial");
@@ -34,15 +36,14 @@ const loader = document.getElementById("loaderElement");
 const loadingContainer = document.querySelector(".loadingContainer");
 const d1 = document.getElementById("d1");
 const iconTemp = document.querySelector(".iconTemp");
-const cityNames = "https://api.turkiyeapi.dev/v1/provinces";
-var cityList = {};
-var cityLat = 0;
-var cityLong = 0;
-var urlMetric = "";
-var city = "";
-var country = "";
-var country_code = "";
-var weatherIcon = "";
+let cityList = {};
+let cityLat = 0;
+let cityLong = 0;
+let urlMetric = "";
+let city = "";
+let country = "";
+let country_code = "";
+let weatherIcon = "";
 const dates = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const datesLong = [
   "Sunday",
@@ -68,36 +69,49 @@ if ("geolocation" in navigator) {
   navigator.geolocation.getCurrentPosition((position) => {
     const lat = position.coords.latitude;
     const lon = position.coords.longitude;
-    const date = new Date().toLocaleDateString("en-US", {
-      weekday: "long",
-    });
-    getWeatherData(lat, lon, date);
+
+    date.textContent = getCurrentDate();
     getCityFromCoords(lat, lon);
   });
 }
 
 /* prend la liste des villes */
 const getCityNames = (ct) => {
-  fetch(ct)
+  showLoader();
+  fetch(
+    `https://geocoding-api.open-meteo.com/v1/search?name=${ct}&count=10&language=en&format=json`,
+  )
     .then((res) => {
       if (res.status != 200) {
         throw new Error(`HTTP ${res.status}`);
       }
       showItems();
-
       return res.json();
     })
-    .then(({ data }) => {
+    .then((data) => {
       showItems();
-      cityList = Object.values(data).map((el) => el.name);
-      createCityDropdwon(cityList);
-
-      date.textContent = new Date().toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
+      if (typeof data.results === "object") {
+        openDropown();
+        cityList = Object.values(data.results).map((el) => ({
+          name: el.name,
+          country: el.country,
+          admin1: el.admin1,
+          country_code: el.country_code,
+          lat: el.latitude,
+          lon: el.longitude,
+        }));
+        cityLat = data.results[0].latitude;
+        cityLong = data.results[0].longitude;
+        createCityDropdwon(cityList);
+      } else {
+        cityContainer.innerHTML = "";
+        const p = document.createElement("p");
+        p.textContent = "No location found";
+        p.className = "dropdown-item";
+        cityContainer.appendChild(p);
+      }
+      hideLoader();
+      date.textContent = getCurrentDate();
     })
     .catch((err) => {
       hideItems();
@@ -105,24 +119,52 @@ const getCityNames = (ct) => {
     });
 };
 
+function getCurrentDate() {
+  return new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
 function showLoader() {
+  openDropown();
+  cityContainer.hidden = true;
   loader.hidden = false;
 }
 
 function hideLoader() {
+  cityContainer.hidden = false;
   loader.hidden = true;
 }
 
-function waitData() {
+function headerDataWait() {
   locations.hidden = true;
   loadingContainer.hidden = false;
 }
 
-function dataShow() {
-  if (cityName.textContent != "" && countryName.textContent != "") {
+function headerDataShow() {
+  if (
+    cityName.textContent != "" &&
+    cityName.textContent != "-" &&
+    temperature.textContent != "" &&
+    temperature.textContent != "-"
+  ) {
     locations.hidden = false;
     loadingContainer.hidden = true;
   }
+}
+function dataShow() {
+  content.style.visibility = "visible";
+  document.body.style.overflow = "auto";
+  noResultFound.style.display = "none";
+}
+
+function dataHide() {
+  content.style.visibility = "hidden";
+  document.body.style.overflow = "hidden";
+  noResultFound.style.display = "inline";
 }
 
 function showItems() {
@@ -138,9 +180,7 @@ function hideItems() {
 }
 
 showItems();
-showLoader();
-getCityNames(cityNames);
-
+dataShow();
 function getCityFromCoords(lat, lon) {
   const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
 
@@ -153,16 +193,18 @@ function getCityFromCoords(lat, lon) {
     })
     .then((data) => {
       const address = data.address;
-      country = address.country;
       city = address.province
         ? address.province
         : address.city || address.town || address.village;
-      cityName.textContent = city;
-      countryName.textContent = country;
 
-      country_code = address.country_code;
-      dataShow();
-      getCoordonates(city, country_code);
+      getCoordonates(city, address.country_code);
+      country =
+        address.country.toLowerCase() === "turquie"
+          ? "Türkiye"
+          : address.country;
+
+      cityName.textContent = city + ", " + country;
+      headerDataShow();
     });
 }
 
@@ -200,7 +242,7 @@ const changeMode = () => {
 
 /* Retourne les coordonnées d'une ville*/
 const getCoordonates = (ct, country_code) => {
-  city = ct;
+  city = ct.split(",")[0].trim();
   fetch(
     `https://geocoding-api.open-meteo.com/v1/search?name=${ct}&country_code=${country_code}&count=10&language=en&format=json`,
   )
@@ -212,6 +254,16 @@ const getCoordonates = (ct, country_code) => {
       return response.json();
     })
     .then((data) => {
+      const TodayDate = new Date().toLocaleDateString("en-US", {
+        weekday: "long",
+      });
+      if (cityLat == 0 || cityLong == 0) {
+        getWeatherData(
+          data.results[0].latitude,
+          data.results[0].longitude,
+          TodayDate,
+        );
+      }
       country = data.results[0].country;
       cityLat = data.results[0].latitude;
       cityLong = data.results[0].longitude;
@@ -223,7 +275,7 @@ const getCoordonates = (ct, country_code) => {
 
 /* Affiche tous les données (Imperial mode) */
 const getImperialCurrentWeather = (lat, long, day) => {
-  waitData();
+  headerDataWait();
   changeMode();
   initialisedData();
   const imp = getLink(lat, long);
@@ -250,7 +302,7 @@ const getImperialCurrentWeather = (lat, long, day) => {
 
 /* Affiche tous les données (Metric mode)*/
 const getWeatherData = (lat, long, day) => {
-  waitData();
+  headerDataWait();
   const link = getLink(lat, long);
   initialisedData();
   if (searchContent.value.trim() != "Search for a place...") {
@@ -287,27 +339,26 @@ const createCityDropdwon = (data) => {
     data.forEach((element) => {
       const p = document.createElement("p");
       p.className = "dropdown-item";
-      p.textContent = element;
+      p.textContent =
+        element.name +
+        ", " +
+        `${element.admin1 ? element.admin1 : ""}` +
+        " (" +
+        element.country +
+        ")";
       p.addEventListener("click", (event) => {
         searchContent.value = event.target.textContent;
-        getCoordonates(event.target.textContent, country_code);
+
         closeDropown();
       });
       cityContainer.appendChild(p);
     });
-    hideLoader();
-  } else {
-    const p = document.createElement("p");
-    p.className = "dropdown-item notFound";
-    p.textContent = "No search result found!";
-    cityContainer.appendChild(p);
   }
 };
 
 // Current Weather
 const createCurrentWeather = (data) => {
-  cityName.textContent = city;
-  countryName.textContent = country;
+  cityName.textContent = city + ", " + country;
   temperature.textContent = data.current.temperature_2m + "°";
   feelsLike.textContent = data.current.apparent_temperature + " °";
   humidity.textContent = data.current.relative_humidity_2m + " %";
@@ -317,12 +368,12 @@ const createCurrentWeather = (data) => {
   precipitation.textContent =
     data.current.precipitation +
     `${mode.textContent.trim() == "imperial" ? " mm" : " in"}`;
-  dataShow();
+  headerDataShow();
 };
 
 const initialisedData = () => {
+  dropdownDays.innerHTML = "";
   cityName.textContent = "-";
-  countryName.textContent = "-";
   temperature.textContent = "";
   feelsLike.textContent = "-";
   humidity.textContent = "-";
@@ -345,10 +396,9 @@ const createDailyWeather = (data, day) => {
       currentDay.textContent = index == 0 ? dayLogName : currentDay.textContent;
     }
     /*create dropdown days ( --ne cree pas si deja cree -- )*/
-    if (currentDay.classList.contains("loading")) {
-      const p = createDays(dayLogName, data.hourly);
-      dropdownDays.appendChild(p);
-    }
+
+    const p = createDays(dayLogName, data.hourly);
+    dropdownDays.appendChild(p);
 
     createDailyData(
       index,
@@ -377,7 +427,6 @@ const createDailyData = (index, maxtemp, mintemp, img, day) => {
 
 const createDays = (day, data) => {
   const p = document.createElement("p");
-
   if (currentDay.textContent === day) {
     p.className = `${day} dropdown-day active`;
   } else {
@@ -488,14 +537,6 @@ const unfocused = () => {
   document.querySelector(`.${day}`).classList.remove("active");
 };
 
-const onTextChange = (txt) => {
-  const citySelected = cityList.filter((el) =>
-    el.toLowerCase().includes(txt.toLowerCase()),
-  );
-
-  createCityDropdwon(citySelected);
-};
-
 const refresh = () => {
   window.location.reload();
 };
@@ -521,11 +562,37 @@ dropsettings.addEventListener("focusout", closeSettings);
 settings.addEventListener("focus", openSettings);
 
 searchbtn.addEventListener("click", () => {
+  dataShow();
+  closeDropown();
   first.forEach((el) => el.classList.add("loading"));
   const day =
     currentDay.textContent.trim() != "-" ? currentDay.textContent.trim() : "-";
   if (searchContent.value != "") {
-    getWeatherData(cityLat, cityLong, day);
+    const name = searchContent.value.trim();
+    let list = Object.values(cityList).filter((el) => {
+      if (searchContent.value.includes(",")) {
+        const text =
+          el.name +
+          ", " +
+          `${el.admin1 ? el.admin1 : ""}` +
+          " (" +
+          el.country +
+          ")";
+        return text.toLowerCase() === name.toLowerCase();
+      }
+      return el.name.toLowerCase() === name.toLowerCase();
+    });
+    if (list.length != 0) {
+      const result = list[0] !== undefined ? { 0: list[0] } : {};
+      Object.values(result).forEach((el) => {
+        city = el.name;
+        country = el.country;
+        getWeatherData(el.lat, el.lon, day);
+      });
+      cityList = result;
+    } else {
+      dataHide();
+    }
   }
 });
 
@@ -536,15 +603,10 @@ Dropdowncontainer.addEventListener("focusout", (e) => {
   }
 });
 
-searchContent.addEventListener("focus", () => {
-  openDropown();
-  if (searchContent.value != "") {
-    onTextChange(searchContent.value);
-  }
-});
-
 searchContent.addEventListener("input", (e) => {
-  onTextChange(e.target.value);
+  if (e.target.value.length != 0) {
+    getCityNames(e.target.value);
+  }
 });
 
 input.addEventListener("mouseleave", () => {
@@ -554,6 +616,7 @@ input.addEventListener("mouseleave", () => {
 switchBtn.addEventListener("click", () => {
   const day =
     currentDay.textContent.trim() != "-" ? currentDay.textContent.trim() : "-";
+
   getImperialCurrentWeather(cityLat, cityLong, day);
   closeSettings();
 });
