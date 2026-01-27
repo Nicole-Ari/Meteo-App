@@ -273,38 +273,12 @@ const getCoordonates = (ct, country_code) => {
     });
 };
 
-/* Affiche tous les données (Imperial mode) */
-const getImperialCurrentWeather = (lat, long, day) => {
-  headerDataWait();
-  changeMode();
-  initialisedData();
-  const imp = getLink(lat, long);
-  if (searchContent.value.trim() != "Search for a place...") {
-    fetch(imp)
-      .then((response) => {
-        if (response.status != 200) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        showItems();
-
-        return response.json();
-      })
-      .then((data) => {
-        createCurrentWeather(data);
-        createDailyWeather(data, day);
-        createHourlyWeather(data, day);
-      })
-      .catch((error) => {
-        hideItems();
-      });
-  }
-};
-
 /* Affiche tous les données (Metric mode)*/
 const getWeatherData = (lat, long, day) => {
   headerDataWait();
-  const link = getLink(lat, long);
+  changeMode();
   initialisedData();
+  const link = getLink(lat, long);
   if (searchContent.value.trim() != "Search for a place...") {
     fetch(link)
       .then((response) => {
@@ -617,7 +591,7 @@ switchBtn.addEventListener("click", () => {
   const day =
     currentDay.textContent.trim() != "-" ? currentDay.textContent.trim() : "-";
 
-  getImperialCurrentWeather(cityLat, cityLong, day);
+  getWeatherData(cityLat, cityLong, day);
   closeSettings();
 });
 
