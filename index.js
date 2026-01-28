@@ -325,7 +325,6 @@ const createCityDropdwon = (data) => {
         cityLong = element.lon;
         closeDropown();
       });
-      console.log(cityLat, cityLong);
       cityContainer.appendChild(p);
     });
   }
