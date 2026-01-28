@@ -276,6 +276,7 @@ const getCoordonates = (ct, country_code) => {
 
 /* Affiche tous les données (Imperial mode) */
 const getImperialCurrentWeather = (lat, long, day) => {
+  headerDataWait();
   changeMode();
   initialisedData();
   const imp = getLink(lat, long);
