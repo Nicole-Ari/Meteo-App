@@ -288,7 +288,6 @@ const getWeatherData = (lat, long, day) => {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
         createCurrentWeather(data);
         createDailyWeather(data, day);
         createHourlyWeather(data, day);
@@ -320,7 +319,6 @@ const createCityDropdwon = (data) => {
         " (" +
         element.country +
         ")";
-      console.log(data);
       p.addEventListener("click", (event) => {
         searchContent.value = event.target.textContent;
         cityLat = element.lat;
