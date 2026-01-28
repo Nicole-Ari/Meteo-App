@@ -154,6 +154,7 @@ function headerDataShow() {
     loadingContainer.hidden = true;
   }
 }
+
 function dataShow() {
   content.style.visibility = "visible";
   document.body.style.overflow = "auto";
@@ -180,6 +181,7 @@ function hideItems() {
 
 showItems();
 dataShow();
+
 function getCityFromCoords(lat, lon) {
   const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
 
@@ -272,10 +274,34 @@ const getCoordonates = (ct, country_code) => {
     });
 };
 
+/* Affiche tous les données (Imperial mode) */
+const getImperialCurrentWeather = (lat, long, day) => {
+  changeMode();
+  initialisedData();
+  const imp = getLink(lat, long);
+  if (searchContent.value.trim() != "Search for a place...") {
+    fetch(imp)
+      .then((response) => {
+        if (response.status != 200) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        showItems();
+        return response.json();
+      })
+      .then((data) => {
+        createCurrentWeather(data);
+        createDailyWeather(data, day);
+        createHourlyWeather(data, day);
+      })
+      .catch((error) => {
+        hideItems();
+      });
+  }
+};
+
 /* Affiche tous les données (Metric mode)*/
 const getWeatherData = (lat, long, day) => {
   headerDataWait();
-  changeMode();
   initialisedData();
   const link = getLink(lat, long);
   if (searchContent.value.trim() != "Search for a place...") {
@@ -369,7 +395,6 @@ const createDailyWeather = (data, day) => {
     } else {
       currentDay.textContent = index == 0 ? dayLogName : currentDay.textContent;
     }
-    /*create dropdown days ( --ne cree pas si deja cree -- )*/
 
     const p = createDays(dayLogName, data.hourly);
     dropdownDays.appendChild(p);
@@ -561,6 +586,8 @@ searchbtn.addEventListener("click", () => {
       Object.values(result).forEach((el) => {
         city = el.name;
         country = el.country;
+        cityLat = el.lat;
+        cityLong = el.lon;
         getWeatherData(el.lat, el.lon, day);
       });
       cityList = result;
@@ -591,7 +618,7 @@ switchBtn.addEventListener("click", () => {
   const day =
     currentDay.textContent.trim() != "-" ? currentDay.textContent.trim() : "-";
 
-  getWeatherData(cityLat, cityLong, day);
+  getImperialCurrentWeather(cityLat, cityLong, day);
   closeSettings();
 });
 
