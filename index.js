@@ -100,8 +100,7 @@ const getCityNames = (ct) => {
           lat: el.latitude,
           lon: el.longitude,
         }));
-        cityLat = data.results[0].latitude;
-        cityLong = data.results[0].longitude;
+
         createCityDropdwon(cityList);
       } else {
         cityContainer.innerHTML = "";
@@ -289,6 +288,7 @@ const getWeatherData = (lat, long, day) => {
         return response.json();
       })
       .then((data) => {
+        console.log(data);
         createCurrentWeather(data);
         createDailyWeather(data, day);
         createHourlyWeather(data, day);
@@ -320,11 +320,14 @@ const createCityDropdwon = (data) => {
         " (" +
         element.country +
         ")";
+      console.log(data);
       p.addEventListener("click", (event) => {
         searchContent.value = event.target.textContent;
-
+        cityLat = element.lat;
+        cityLong = element.lon;
         closeDropown();
       });
+      console.log(cityLat, cityLong);
       cityContainer.appendChild(p);
     });
   }
