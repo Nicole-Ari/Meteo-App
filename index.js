@@ -190,6 +190,7 @@ function getCityFromCoords(lat, lon) {
       if (!response.ok) {
         throw new Error("Reverse geocoding failed");
       }
+      showItems();
       return response.json();
     })
     .then((data) => {
@@ -258,13 +259,13 @@ const getCoordonates = (ct, country_code) => {
       const TodayDate = new Date().toLocaleDateString("en-US", {
         weekday: "long",
       });
-      if (cityLat == 0 || cityLong == 0) {
-        getWeatherData(
-          data.results[0].latitude,
-          data.results[0].longitude,
-          TodayDate,
-        );
-      }
+
+      getWeatherData(
+        data.results[0].latitude,
+        data.results[0].longitude,
+        TodayDate,
+      );
+
       country = data.results[0].country;
       cityLat = data.results[0].latitude;
       cityLong = data.results[0].longitude;
