@@ -275,7 +275,7 @@ const getCoordonates = (ct, country_code) => {
     });
 };
 
-/* Affiche tous les données (Imperial mode) */
+/* Affiche tous les données (Imperial  mode) */
 const getImperialCurrentWeather = (lat, long, day) => {
   headerDataWait();
   changeMode();
